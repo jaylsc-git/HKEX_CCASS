@@ -1,0 +1,4 @@
+[MASTER]
+max-line-length=200
+ignore=tests.py,migrations
+disable=too-few-public-methods,no-init,missing-docstring,old-style-class,invalid-name,too-many-ancestors,no-member,protected-access,arguments-differ
