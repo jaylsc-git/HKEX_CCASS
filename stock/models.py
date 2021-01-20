@@ -24,7 +24,7 @@ class Stockholding(models.Model):
     share_percent = models.FloatField(verbose_name="Percent of total issued number",
                                       validators=[MinValueValidator(0),
                                                   MaxValueValidator(100)],)
-    total_shares = models.BigIntegerField(
+    total_shares = models.BigIntegerField(blank=True, null=True,
         verbose_name="Total Shares", default=0)
     daily_diff = models.FloatField(
         blank=True, null=True, verbose_name="Daily Change")

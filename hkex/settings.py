@@ -25,7 +25,7 @@ SECRET_KEY = 'mw+y7l9-d=v1o(*-(cj&f4_xkg@r1x3@s&(g7f*n^d!lg0q05('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.ap-northeast-1.elasticbeanstalk.com', '127.0.0.1']
 
 
 # Application definition
@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'import_export',
-    # 'advanced_filters',
     'stock',
 ]
 
@@ -76,18 +75,30 @@ WSGI_APPLICATION = 'hkex.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'web',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+if "RDS_DB_NAME" in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+        }
     }
-}
-
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'db.sqlite3',
+            # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            # 'NAME': 'web',
+            # 'USER': 'postgres',
+            # 'PASSWORD': 'admin',
+            # 'HOST': '127.0.0.1',
+            # 'PORT': '5432',
+        }
+    }
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -130,8 +141,8 @@ MEDIA_ROOT = os.path.join(CURRENT_PATH, 'media')
 
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (os.path.join(CURRENT_PATH, 'static'),)
+
