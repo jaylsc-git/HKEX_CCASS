@@ -25,6 +25,18 @@
     });
 </script>
 
+<script type="text/javascript">
+
+$(window).load(function(){
+    if ("{{task}}" =="1") {
+        $("tb1").show()
+    }
+    else{
+        $("tb2").show()
+    }  
+})
+</script>
+
 <form action="/stock/scrape" method="post">
     {% csrf_token %}
     {{ form }}
@@ -78,6 +90,62 @@
                     } );
                 
                     var table = $('#tb1').DataTable( {
+                        orderCellsTop: true,
+                        fixedHeader: true
+                    } );
+                });
+            </script>
+        {% else %} 
+            <span style="color:red;font-weight:bold"> Please check the stock code and date range </span> 
+        {% endif %}
+    </tbody>
+
+</table>
+
+
+<table id="tb2" class="table display">
+    <thead>
+        <tr>
+            <th>Participant 2</th>
+            <th>Name</th>
+            <th>Lastest Shareholding</th>
+            <th>Lastest % of the total issued number</th>
+            <th>Recent trend</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        {% if data %} 
+            {% for row in data %}
+                
+            <tr>
+                <th>{{row.participant_id}}</th>
+                <th>{{row.name}}</th>
+                <th>{{row.share}}</th>
+                <th>{{row.share_percent}}</th>
+                <th><span class="inlinebar"> {{ line_chart_data|get_item:row.participant_id }} </span></th>
+
+            </tr>
+            {% endfor %}
+            <script type="text/javascript">
+                $(document).ready( function () {
+                    // Setup - add a text input to each footer cell
+                    $('#tb2 thead tr').clone(true).appendTo( '#tb2 thead' );
+                    $('#tb2 thead tr:eq(1) th').each( function (i) {
+                        var title = $(this).text();
+                        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+                
+                        $( 'input', this ).on( 'keyup change', function () {
+                            if ( table.column(i).search() !== this.value ) {
+                                table
+                                    .column(i)
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        } );
+                    } );
+                
+                    var table = $('#tb2').DataTable( {
                         orderCellsTop: true,
                         fixedHeader: true
                     } );

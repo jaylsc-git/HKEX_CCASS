@@ -6,6 +6,14 @@ class ScrapeForm(forms.Form):
     stock = forms.IntegerField(label='Stock Number')
     start_date = forms.DateField(label='Start Date', widget=forms.SelectDateWidget(years=range(datetime.today().year-1, datetime.today().year+1)))
     end_date = forms.DateField(label='End Date', widget=forms.SelectDateWidget(years=range(datetime.today().year-1, datetime.today().year+1)))
+    threshold =  forms.FloatField(label='Threshold')
+    
+    STATUS_CHOICES = (
+        (1, "Trend",),
+        (2, "Transactions",),
+    )
+    
+    task = forms.ChoiceField(choices = STATUS_CHOICES, label="", initial='', widget=forms.Select(), required=True)
 
     def clean(self):
         cleaned_data = super().clean()

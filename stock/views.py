@@ -12,6 +12,7 @@ from .models import Stock, Stockholding, Weekday
 
 # Create your views here.
 
+
 def scrape_view(request):
     form = ScrapeForm()
     if request.method == 'POST':
@@ -35,7 +36,7 @@ def trans_view(request):
     return 1
 
 
-def get_hkex(stock, start_date, end_date, **kwargs):
+def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
     cookies = {
         'TS6b4c3a62027': '08754bc291ab2000ff46ee968aa41b7dec45c5c4f00eb1aa66282e7d6de90846366c536ae70779d408caa4f0d6113000eb369bcd1d84ca38ee6ad7aa16718090eef1835ad5c832d3fdfb5883f045f5548e4cde3782d251448f9790f8400f1a77',
         'TSfff9c5ca027': '086f2721efab2000208d7a44f0b438054ccabdc2f24fd742bc37237e00694a8777df6ed1b94dd4d30844c60e90113000bc416d1da224c5b6225c0ba1890a79545323c226627ac56f57cd3993f8e5d3569c7b11686e2a24490974d9957a006187',
@@ -112,25 +113,23 @@ def get_hkex(stock, start_date, end_date, **kwargs):
 
     first_trading_date = trading_day_range.first()
     last_trading_date = trading_day_range.last()
-    last_stockholding_qs = Stockholding.objects.filter(
-        date=last_trading_date.date, stock=stock_obj).order_by("-share_percent")[:10]
-
     line_chart_data = {}
-    for d in Stockholding.objects.filter(date__gte=start_date, date__lte=end_date, stock=stock_obj, participant_id__in=[q.participant_id for q in last_stockholding_qs]).order_by('date').all():
-        if d.participant_id in line_chart_data:
-            line_chart_data[d.participant_id] += [d.share]
-        else:
-            line_chart_data[d.participant_id] = [d.share]
+    if task == "1":
+        qs = Stockholding.objects.filter(
+            date=last_trading_date.date, stock=stock_obj).order_by("-share_percent")[:10]
+        for d in Stockholding.objects.filter(date__gte=start_date, date__lte=end_date, stock=stock_obj, participant_id__in=[q.participant_id for q in qs]).order_by('date').all():
+            if d.participant_id in line_chart_data:
+                line_chart_data[d.participant_id] += [d.share]
+            else:
+                line_chart_data[d.participant_id] = [d.share]
+        for key, value in line_chart_data.items():
+            line_chart_data[key] = ','.join(map(str, value))
 
-    for key, value in line_chart_data.items():
-        line_chart_data[key] = ','.join(map(str, value))
-
-    from django_pandas.io import read_frame
-    Stockholding.objects.filter(date__gte=start_date, date__lte=end_date, stock=stock_obj).filter(
-        share_percent__gt=1).order_by('date').all()
-
+    else:
+        qs = Stockholding.objects.filter(date__gte=start_date, date__lte=end_date,
+                                         stock=stock_obj, share_percent__gte=threshold).order_by('date').all()
     call_command('holding_change')
-    return {"stock": stock_obj, "first_trade_date": first_trading_date.date, "last_trade_date": last_trading_date.date, "data": last_stockholding_qs, "line_chart_data": line_chart_data}
+    return {"task": task, "stock": stock_obj, "first_trade_date": first_trading_date.date, "last_trade_date": last_trading_date.date, "data": qs, "line_chart_data": line_chart_data}
 
 
 def get_hkex_holiday():
