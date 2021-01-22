@@ -25,7 +25,7 @@ SECRET_KEY = 'mw+y7l9-d=v1o(*-(cj&f4_xkg@r1x3@s&(g7f*n^d!lg0q05('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.ap-northeast-1.elasticbeanstalk.com', '127.0.0.1']
+ALLOWED_HOSTS = ['.ap-northeast-1.elasticbeanstalk.com', '127.0.0.1','staff.kura-corpo.co.jp']
 
 
 # Application definition
@@ -75,6 +75,17 @@ WSGI_APPLICATION = 'hkex.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+""" DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'ebdb',
+            'USER': 'jayleung',
+            'PASSWORD': '12345678',
+            'HOST': 'aa2z92wtmt1nmq.cchfjqmqb5xa.ap-northeast-1.rds.amazonaws.com',
+            'PORT': '5432',
+        }
+    } """
+ 
 if "RDS_DB_NAME" in os.environ:
     DATABASES = {
         'default': {
@@ -98,7 +109,7 @@ else:
             # 'HOST': '127.0.0.1',
             # 'PORT': '5432',
         }
-    }
+    } 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -144,5 +155,4 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATIC_URL = '/static/'
-
 

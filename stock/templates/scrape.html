@@ -25,6 +25,18 @@
     });
 </script>
 
+<script type="text/javascript">
+
+$(window).load(function(){
+    if ("{{task}}" =="1") {
+        $("tb1").show()
+    }
+    else{
+        $("tb2").show()
+    }  
+})
+</script>
+
 <form action="/stock/scrape" method="post">
     {% csrf_token %}
     {{ form }}
@@ -114,8 +126,11 @@
                     <th>{{row.participant_id}}</th>
                     <th>{{row.name}}</th>
                     <th>{{row.share}}</th>
-                    <th>{{row.daily_percent_diff}}</th>
-
+                    {% if row.daily_percent_diff > 0 %}
+                        <th bgcolor="green" >{{row.daily_percent_diff}}</th>
+                    {% else %}  
+                        <th bgcolor="red" >{{row.daily_percent_diff}}</th>
+                    {% endif %}    
                 </tr>
                 {% endfor %}
                 <script type="text/javascript">
@@ -149,3 +164,4 @@
 
     </table>
 {% endif %}
+

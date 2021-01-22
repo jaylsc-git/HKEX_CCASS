@@ -26,19 +26,15 @@ t2 AS
 )
 
 		
-UPDATE stock_stockholding 
-SET    (daily_diff,daily_percent_diff)=(SELECT t2.daily_diff,t2.daily_percent_diff
+UPDATE stock_stockholding s
+SET    (daily_diff,daily_percent_diff)=
+(SELECT t2.daily_diff,t2.daily_percent_diff
 FROM t2
-WHERE  id=t2.id);
-
+WHERE s.id=t2.id);
     """
-
+	
     @transaction.atomic
     def handle(self, *args, **kwargs):
-        text_file = open("Output.txt", "w")
-        text_file.write(self.sql)
-        text_file.close()
-
         cursor = connection.cursor()
         cursor.execute(self.sql)
         cursor.close()

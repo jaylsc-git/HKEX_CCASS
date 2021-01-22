@@ -1,5 +1,4 @@
 import datetime
-
 import numpy as np
 import pandas as pd
 import requests
@@ -114,7 +113,7 @@ def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
     first_trading_date = trading_day_range.first()
     last_trading_date = trading_day_range.last()
     line_chart_data = {}
-    
+
     if task == "1":
         qs = Stockholding.objects.filter(
             date=last_trading_date.date, stock=stock_obj).order_by("-share_percent")[:10]
@@ -129,6 +128,9 @@ def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
     else:
         qs = Stockholding.objects.filter(date__gte=start_date, date__lte=end_date,
                                          stock=stock_obj, daily_percent_diff__gte=threshold).order_by('date').all()
+
+        qs = qs.union(Stockholding.objects.filter(date__gte=start_date, date__lte=end_date,
+                                         stock=stock_obj, daily_percent_diff__lte=-1*threshold).order_by('date').all())
 
     call_command('holding_change')
     return {"task": task, "stock": stock_obj, "first_trade_date": first_trading_date.date, "last_trade_date": last_trading_date.date, "data": qs, "line_chart_data": line_chart_data}
