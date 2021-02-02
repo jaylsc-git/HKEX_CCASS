@@ -105,7 +105,7 @@ def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
             for _, row in df.iterrows()
         ]
         Stockholding.objects.bulk_create(new_Stockholding_objs)
-        #print('total',total_shares)
+
     first_trading_date = trading_day_range.first()
     last_trading_date = trading_day_range.last()
     line_chart_data = {}
