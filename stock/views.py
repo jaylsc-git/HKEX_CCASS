@@ -9,9 +9,7 @@ from django.shortcuts import render
 from .forms import ScrapeForm
 from .models import Stock, Stockholding, Weekday
 
-# Create your views here.
-
-
+#callback funtion
 def scrape_view(request):
     form = ScrapeForm()
     if request.method == 'POST':
@@ -30,6 +28,7 @@ def scrape_view(request):
     }
     return render(request, 'scrape.html', variables)
 
+#query data from hkex ccass
 def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
     cookies = {
         'TS6b4c3a62027': '08754bc291ab2000ff46ee968aa41b7dec45c5c4f00eb1aa66282e7d6de90846366c536ae70779d408caa4f0d6113000eb369bcd1d84ca38ee6ad7aa16718090eef1835ad5c832d3fdfb5883f045f5548e4cde3782d251448f9790f8400f1a77',
@@ -73,6 +72,7 @@ def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
 
     trading_day_range = Weekday.objects.filter(
         date__gte=start_date, date__lte=end_date, holiday=False).order_by('date').all()
+    #Check whether it is a valid trading day
     if not trading_day_range:
         return {}
     for query_date in trading_day_range:
@@ -86,6 +86,7 @@ def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
             total_shares = float(soup.findAll(
                 "div", {"class": "summary-value"})[0].string.replace(',', ''))
             df = pd.read_html(response.text, header=0)[0]
+        #skip if date range or stock code is invalid
         except (ValueError, IndexError):
             continue
         df.columns = ['participant_id', 'name',
@@ -109,6 +110,7 @@ def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
     last_trading_date = trading_day_range.last()
     line_chart_data = {}
 
+    #Transform data based on mode - trend or transactions
     if task == "1":
         qs = Stockholding.objects.filter(
             date=last_trading_date.date, stock=stock_obj).order_by("-share_percent")[:10]
@@ -131,6 +133,7 @@ def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
     return {"task": task, "stock": stock_obj, "first_trade_date": first_trading_date.date, "last_trade_date": last_trading_date.date, "data": qs, "line_chart_data": line_chart_data}
 
 
+#query exchange holiday
 def get_hkex_holiday():
     url = "https://www.hkex.com.hk/-/media/HKEX-Market/Mutual-Market/Stock-Connect/Reference-Materials/Trading-Hour,-Trading-and-Settlement-Calendar/{0}-Calendar_csv_e.csv?la=en"
     for i in range(datetime.datetime.today().year-1, datetime.datetime.today().year+1):
