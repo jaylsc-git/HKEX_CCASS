@@ -30,11 +30,6 @@ def scrape_view(request):
     }
     return render(request, 'scrape.html', variables)
 
-
-def trans_view(request):
-    return 1
-
-
 def get_hkex(stock, start_date, end_date, task, threshold, **kwargs):
     cookies = {
         'TS6b4c3a62027': '08754bc291ab2000ff46ee968aa41b7dec45c5c4f00eb1aa66282e7d6de90846366c536ae70779d408caa4f0d6113000eb369bcd1d84ca38ee6ad7aa16718090eef1835ad5c832d3fdfb5883f045f5548e4cde3782d251448f9790f8400f1a77',
