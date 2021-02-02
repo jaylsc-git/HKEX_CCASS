@@ -1,8 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-# Create your models here.
 
-
+#define input of form and columns in database
 class Stock(models.Model):
     code = models.IntegerField(verbose_name='Stock Code')
     name = models.TextField(null=True, blank=True)
